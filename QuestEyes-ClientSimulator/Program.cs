@@ -2,7 +2,6 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using System.Timers;
 using Timer = System.Timers.Timer;
 
 bool connecting = false;
@@ -70,20 +69,20 @@ try
     udp.EnableBroadcast = true;
 
     Timer udpTimer = new();
-    udpTimer.Elapsed += new ElapsedEventHandler(udpSend(udp, broadcastString, endPoint));
-    udpTimer.Interval = 10000;
+    udpTimer.Elapsed += (sender, e) => udpSend(sender, e, connecting, connected, udp, broadcastString, endPoint);
+    udpTimer.Interval = 1000;
     udpTimer.Start();
 
 } catch (Exception e) {
     Console.WriteLine(e);
 }
 
-ElapsedEventHandler? udpSend(Socket udp, Byte[] broadcastString, IPEndPoint endPoint)
+static void udpSend(object sender, EventArgs e, bool connecting, bool connected, Socket udp, Byte[] broadcastString, IPEndPoint endPoint)
 {
-    while (connecting == false && connected == false)
+    if (connecting == false && connected == false)
     {
         udp.SendTo(broadcastString, endPoint);
     }
-    return null;
 }
 
+//setup websocket logic and handle connection
